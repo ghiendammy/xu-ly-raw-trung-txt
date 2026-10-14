@@ -116,7 +116,7 @@
             </div>
 
             <!-- Nút Thực Hiện Chính Thức -->
-            <button onclick="processCleanText()" class="w-full bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm mt-auto cursor-pointer">
+            <button id="btn-process" onclick="processCleanText()" class="w-full bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm mt-auto cursor-pointer">
                 <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Tiến Hành Dọn Rác Ngay
             </button>
         </aside>
@@ -141,6 +141,17 @@
                 <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm">
                     <p class="text-[11px] font-semibold text-slate-400 uppercase">Số dòng rác đã xóa</p>
                     <p id="stat-removed-lines" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">0</p>
+                </div>
+            </div>
+
+            <!-- Thanh Progress Bar hiển thị tiến trình xóa file nặng -->
+            <div id="progress-container" class="hidden bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-900 rounded-xl p-3 shadow-sm flex flex-col gap-1.5">
+                <div class="flex justify-between items-center text-xs font-semibold text-sky-700 dark:text-sky-300">
+                    <span id="progress-status"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang xử lý dọn rác...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="bg-sky-500 h-full w-0 transition-all duration-150"></div>
                 </div>
             </div>
 
@@ -233,6 +244,12 @@
         const cleanTextarea = document.getElementById('clean-textarea');
         const fileNameDisplay = document.getElementById('file-name-display');
         const statusNotification = document.getElementById('status-notification');
+        
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressStatus = document.getElementById('progress-status');
+        const btnProcess = document.getElementById('btn-process');
 
         let currentFileName = "truyen_da_lam_sach.txt";
 
@@ -264,11 +281,14 @@
             currentFileName = file.name.replace('.txt', '_clean.txt');
             fileNameDisplay.textContent = file.name;
 
+            statusNotification.textContent = `Đang đọc file "${file.name}"...`;
+            
             const reader = new FileReader();
             reader.onload = (e) => {
                 rawTextarea.value = e.target.result;
-                statusNotification.textContent = `Đã tải file "${file.name}" thành công. Hãy bấm "Tiến Hành Dọn Rác Ngay".`;
-                processCleanText();
+                const lineCount = e.target.result.split(/\r?\n/).length;
+                updateStats(e.target.result.length, 0, lineCount, 0);
+                statusNotification.textContent = `Tải file thành công (${lineCount.toLocaleString()} dòng). Hãy bấm "Tiến Hành Dọn Rác Ngay".`;
             };
             reader.readAsText(file);
         }
@@ -304,8 +324,8 @@
             /撤消/gi
         ];
 
-        // --- NÚT TIẾN HÀNH DỌN RÁC ---
-        function processCleanText() {
+        // --- NÚT TIẾN HÀNH DỌN RÁC (CÓ THANH TIẾN TRÌNH) ---
+        async function processCleanText() {
             const rawText = rawTextarea.value;
             if (!rawText.trim()) {
                 alert("Vui lòng dán văn bản hoặc tải file TXT vào khung bên trái trước!");
@@ -316,47 +336,73 @@
             const cleanMixed = document.getElementById('opt-mixed').checked;
             const cleanWhitespace = document.getElementById('opt-whitespace').checked;
 
+            // Hiển thị giao diện Tiến trình
+            btnProcess.disabled = true;
+            btnProcess.classList.add('opacity-50', 'cursor-not-allowed');
+            progressContainer.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            progressPercent.textContent = '0%';
+            progressStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang chuẩn bị phân tích dữ liệu...`;
+
+            await new Promise(r => setTimeout(r, 50));
+
             let lines = rawText.split(/\r?\n/);
             const origLineCount = lines.length;
             let cleanedLines = [];
             let removedCount = 0;
 
-            lines.forEach(line => {
-                let currentLine = line;
-                let isTrashLine = false;
+            const chunkSize = 2500; // Xử lý từng khối 2500 dòng để không đơ trình duyệt
+            let processedLines = 0;
 
-                // Kiểm tra loại 1: Xbanxia
-                if (cleanXbanxia) {
-                    for (let reg of XBANXIA_REGEXES) {
-                        if (reg.test(currentLine)) {
-                            isTrashLine = true;
-                            currentLine = currentLine.replace(reg, '');
+            for (let i = 0; i < origLineCount; i += chunkSize) {
+                const chunk = lines.slice(i, i + chunkSize);
+                
+                chunk.forEach(line => {
+                    let currentLine = line;
+                    let isTrashLine = false;
+
+                    if (cleanXbanxia) {
+                        for (let reg of XBANXIA_REGEXES) {
+                            if (reg.test(currentLine)) {
+                                isTrashLine = true;
+                                currentLine = currentLine.replace(reg, '');
+                            }
                         }
                     }
-                }
 
-                // Kiểm tra loại 2: Anh/Việt quảng cáo
-                if (cleanMixed) {
-                    for (let reg of MIXED_JUNK_REGEXES) {
-                        if (reg.test(currentLine)) {
-                            isTrashLine = true;
-                            currentLine = currentLine.replace(reg, '');
+                    if (cleanMixed) {
+                        for (let reg of MIXED_JUNK_REGEXES) {
+                            if (reg.test(currentLine)) {
+                                isTrashLine = true;
+                                currentLine = currentLine.replace(reg, '');
+                            }
                         }
                     }
-                }
 
-                // Nếu sau khi lọc mà dòng trống hoặc hoàn toàn chứa rác dính kèm
-                if (isTrashLine && currentLine.trim() === "") {
-                    removedCount++;
-                    return; // Bỏ qua dòng này
-                }
+                    if (isTrashLine && currentLine.trim() === "") {
+                        removedCount++;
+                        return;
+                    }
 
-                cleanedLines.push(currentLine);
-            });
+                    cleanedLines.push(currentLine);
+                });
+
+                processedLines += chunk.length;
+                const percent = Math.min(100, Math.round((processedLines / origLineCount) * 100));
+                
+                progressBar.style.width = percent + '%';
+                progressPercent.textContent = percent + '%';
+                progressStatus.innerHTML = `<i class="fa-solid fa-broom fa-spin mr-1"></i> Đang dọn rác... (${processedLines.toLocaleString()}/${origLineCount.toLocaleString()} dòng)`;
+
+                // Nhường UI cập nhật tiến trình
+                await new Promise(r => setTimeout(r, 0));
+            }
+
+            progressStatus.innerHTML = `<i class="fa-solid fa-align-left mr-1"></i> Đang chuẩn hóa định dạng dòng...`;
+            await new Promise(r => setTimeout(r, 10));
 
             let resultText = cleanedLines.join('\n');
 
-            // Lọc loại 3: Chuẩn hóa khoảng trắng & dòng trống thừa
             if (cleanWhitespace) {
                 resultText = resultText.replace(/\n\s*\n\s*\n+/g, '\n\n');
                 resultText = resultText.split('\n').map(l => l.trim()).join('\n');
@@ -364,12 +410,24 @@
 
             cleanTextarea.value = resultText;
 
-            // Thống kê chính xác
             const finalLines = resultText.split('\n').length;
             const totalRemoved = Math.max(removedCount, origLineCount - finalLines);
 
             updateStats(rawText.length, resultText.length, origLineCount, totalRemoved);
-            statusNotification.textContent = `Đã dọn sạch thành công! Đã loại bỏ ${totalRemoved} dòng rác.`;
+            
+            // Hoàn tất tiến trình
+            progressBar.style.width = '100%';
+            progressPercent.textContent = '100%';
+            progressStatus.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Hoàn tất dọn rác thành công!`;
+            
+            statusNotification.textContent = `Đã dọn sạch thành công! Đã loại bỏ ${totalRemoved.toLocaleString()} dòng rác.`;
+            
+            btnProcess.disabled = false;
+            btnProcess.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+            }, 3000);
         }
 
         function updateStats(origChars, cleanChars, origLines, removedLines) {
@@ -435,6 +493,7 @@
             fileNameDisplay.textContent = "";
             currentFileName = "truyen_da_lam_sach.txt";
             updateStats(0, 0, 0, 0);
+            progressContainer.classList.add('hidden');
             statusNotification.textContent = "Đã làm mới toàn bộ không gian làm việc.";
         }
     </script>
