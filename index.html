@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TXT Cleaner Pro - Dọn Rác Truyện Trung Quốc</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'Segoe UI', 'sans-serif'] },
+                    colors: {
+                        primary: '#0284c7',
+                        'primary-hover': '#0369a1'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        body { background-color: #f8fafc; }
+        .dark body { background-color: #0f172a; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .drop-active { border-color: #0284c7 !important; background-color: rgba(2, 132, 199, 0.05) !important; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-slate-800 dark:text-slate-200 font-sans">
+
+    <header class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 h-14 flex items-center justify-between px-4 shrink-0 z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-broom-ball"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base md:text-lg leading-tight">TXT Raw Cleaner</h1>
+                <p class="text-[11px] text-slate-400">Chuyên dọn rác truyện Trung Quốc (xbanxia & quảng cáo Anh/Việt)</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <button id="theme-toggle" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="Đổi giao diện Sáng/Tối">
+                <i class="fa-solid fa-moon dark:hidden text-slate-600"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+            </button>
+            <button onclick="clearAllData()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 text-slate-600 dark:text-slate-300 py-1.5 px-3 rounded font-medium transition-colors">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Làm mới
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Cột Trái: Control Panel & Options -->
+        <aside class="w-full lg:w-[340px] bg-white dark:bg-slate-800 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 p-4 flex flex-col shrink-0 overflow-y-auto gap-4">
+            
+            <!-- Area Nhập File / Drag & Drop -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">1. Chọn hoặc kéo thả file TXT</label>
+                <div id="drop-zone" class="border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-sky-500 rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-arrow-up text-3xl text-sky-500"></i>
+                    <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">Nhấp để tải file TXT hoặc Kéo thả vào đây</p>
+                    <p class="text-[11px] text-slate-400">Hỗ trợ file UTF-8, GBK (.txt)</p>
+                    <input type="file" id="file-input" accept=".txt" class="hidden">
+                </div>
+            </div>
+
+            <hr class="border-slate-200 dark:border-slate-700">
+
+            <!-- Bộ lọc cấu hình dọn dẹp -->
+            <div class="space-y-3">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">2. Bộ lọc dọn rác</label>
+                
+                <!-- Option 1: Xbanxia -->
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
+                    <input type="checkbox" id="opt-xbanxia" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
+                    <div class="text-xs">
+                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Xbanxia & QC Trung Quốc</span>
+                        <span class="text-slate-400 text-[11px]">Xóa câu "如有惡意廣告...", proton.me, xbanxia, banxia...</span>
+                    </div>
+                </label>
+
+                <!-- Option 2: Anh / Việt Lẫn Lộn -->
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
+                    <input type="checkbox" id="opt-mixed" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
+                    <div class="text-xs">
+                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Anh / Việt tự động</span>
+                        <span class="text-slate-400 text-[11px]">Lọc Sponsored, You May Like, Forex, IC Markets, WPS Office...</span>
+                    </div>
+                </label>
+
+                <!-- Option 3: Chuẩn hóa khoảng trắng & dòng trống -->
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
+                    <input type="checkbox" id="opt-whitespace" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
+                    <div class="text-xs">
+                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Chuẩn hóa khoảng trắng</span>
+                        <span class="text-slate-400 text-[11px]">Gộp nhiều dòng trống liên tiếp thành 1 dòng, xóa khoảng trắng thừa</span>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Nút Thực Hiện -->
+            <button onclick="processCleanText()" class="w-full bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm mt-auto">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Tiến Hành Dọn Rác
+            </button>
+        </aside>
+
+        <section class="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 overflow-hidden p-4 gap-4">
+            
+            <!-- Thống kê kết quả -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase">Ký tự ban đầu</p>
+                    <p id="stat-orig-chars" class="text-lg font-bold text-slate-700 dark:text-slate-200">0</p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase">Ký tự sau dọn</p>
+                    <p id="stat-clean-chars" class="text-lg font-bold text-sky-600 dark:text-sky-400">0</p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase">Số dòng ban đầu</p>
+                    <p id="stat-orig-lines" class="text-lg font-bold text-slate-700 dark:text-slate-200">0</p>
+                </div>
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase">Số dòng rác đã xóa</p>
+                    <p id="stat-removed-lines" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">0</p>
+                </div>
+            </div>
+
+            <!-- Khung So Sánh / Chỉnh Sửa Văn Bản -->
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
+                
+                <!-- Khung Đầu Vào (Gốc) -->
+                <div class="flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-100 dark:bg-slate-700/50 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-lines"></i> VĂN BẢN GỐC (RAW)
+                        </span>
+                        <span id="file-name-display" class="text-[11px] text-slate-400 truncate max-w-[150px]"></span>
+                    </div>
+                    <textarea id="raw-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Dán văn bản TXT Trung Quốc vào đây hoặc kéo thả file TXT ở bên trái..."></textarea>
+                </div>
+
+                <!-- Khung Đầu Ra (Đã Làm Sạch) -->
+                <div class="flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-100 dark:bg-slate-700/50 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                        <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (CÓ THỂ SỬA)
+                        </span>
+                        <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors">
+                            <i class="fa-solid fa-copy"></i> Sao chép
+                        </button>
+                    </div>
+                    <textarea id="clean-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây..."></textarea>
+                </div>
+
+            </div>
+
+            <!-- Thanh Tải Về Nhanh -->
+            <div class="flex justify-end items-center gap-3 shrink-0">
+                <button onclick="downloadCleanTxt()" class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-download"></i> Tải File TXT Đã Làm Sạch
+                </button>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        // --- Dark mode logic ---
+        const htmlEl = document.documentElement;
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlEl.classList.add('dark');
+        }
+        document.getElementById('theme-toggle').onclick = () => {
+            htmlEl.classList.toggle('dark');
+            localStorage.theme = htmlEl.classList.contains('dark') ? 'dark' : 'light';
+        };
+
+        // --- Core Elements ---
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const rawTextarea = document.getElementById('raw-textarea');
+        const cleanTextarea = document.getElementById('clean-textarea');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        let currentFileName = "truyen_da_lam_sach.txt";
+
+        // Drag & Drop handlers
+        dropZone.onclick = () => fileInput.click();
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.add('drop-active'); });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.remove('drop-active'); });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFileSelect(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
+        });
+
+        function handleFileSelect(file) {
+            if (!file.name.endsWith('.txt')) {
+                alert("Vui lòng chỉ chọn file dạng .txt!");
+                return;
+            }
+            currentFileName = file.name.replace('.txt', '_clean.txt');
+            fileNameDisplay.textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                rawTextarea.value = e.target.result;
+                processCleanText();
+            };
+            reader.readAsText(file);
+        }
+
+        // Tự động tính toán lại khi gõ trực tiếp vào raw
+        rawTextarea.addEventListener('input', () => {
+            processCleanText();
+        });
+
+        // --- DANH SÁCH MẪU RÁC CẦN LỌC TRIỆT ĐỂ ---
+        
+        // 1. Dạng rác Xbanxia & QC Trung Quốc
+        const XBANXIA_REGEXES = [
+            /如有惡意廣告.*xbanxia@proton\.me/gi,
+            /如有惡意廣告.*請將截屏或錄屏發送至.*/gi,
+            /xbanxia@proton\.me/gi,
+            /xbanxia/gi,
+            /banxia/gi,
+            /【.*惡意廣告.*】/gi
+        ];
+
+        // 2. Dạng rác Tiếng Anh & Tiếng Việt quảng cáo (English/Vietnamese mix noise)
+        const MIXED_JUNK_REGEXES = [
+            /You May Like/gi,
+            /Sponsored/gi,
+            /Giao dịch Forex/gi,
+            /Giao dịch chứng khoán/gi,
+            /Spread cạnh tranh/gi,
+            /Thanh khoản sâu/gi,
+            /Đã đến lúc giao dịch/gi,
+            /IC\s*\|\s*Sponsored/gi,
+            /C’est légal/gi,
+            /WPS Office/gi,
+            /Thưởng Nạp Đến 5\.000 USD/gi,
+            /Tải Về/gi,
+            /Hợp đồng tương lai/gi,
+            /Dow,\s*DAX/gi,
+            /FTSE/gi,
+            /S&P/gi,
+            /Tài khoản Demo/gi
+        ];
+
+        // --- THUẬT TOÁN XỬ LÝ LÀM SẠCH VĂN BẢN ---
+        function processCleanText() {
+            const rawText = rawTextarea.value;
+            if (!rawText.trim()) {
+                cleanTextarea.value = "";
+                updateStats(0, 0, 0, 0);
+                return;
+            }
+
+            const cleanXbanxia = document.getElementById('opt-xbanxia').checked;
+            const cleanMixed = document.getElementById('opt-mixed').checked;
+            const cleanWhitespace = document.getElementById('opt-whitespace').checked;
+
+            let lines = rawText.split(/\r?\n/);
+            const origLineCount = lines.length;
+            let cleanedLines = [];
+
+            lines.forEach(line => {
+                let currentLine = line;
+
+                // Lọc loại 1: Xbanxia & QC Trung Quốc
+                if (cleanXbanxia) {
+                    XBANXIA_REGEXES.forEach(reg => {
+                        currentLine = currentLine.replace(reg, '');
+                    });
+                }
+
+                // Lọc loại 2: Anh/Việt quảng cáo
+                if (cleanMixed) {
+                    MIXED_JUNK_REGEXES.forEach(reg => {
+                        currentLine = currentLine.replace(reg, '');
+                    });
+                }
+
+                // Nếu dòng chỉ chứa khoảng trắng sau khi dọn bớt rác, xem như dòng trống
+                cleanedLines.push(currentLine);
+            });
+
+            let resultText = cleanedLines.join('\n');
+
+            // Lọc loại 3: Chuẩn hóa khoảng trắng & dòng trống
+            if (cleanWhitespace) {
+                // Thay thế nhiều dòng trống liên tiếp (3 dòng trở lên) thành 1 dòng trống chuẩn
+                resultText = resultText.replace(/\n\s*\n\s*\n+/g, '\n\n');
+                // Xóa khoảng trắng thừa ở đầu/cuối mỗi dòng
+                resultText = resultText.split('\n').map(l => l.trim()).join('\n');
+            }
+
+            cleanTextarea.value = resultText;
+
+            // Thống kê
+            const finalLines = resultText.split('\n').length;
+            const removedLines = Math.max(0, origLineCount - finalLines);
+
+            updateStats(rawText.length, resultText.length, origLineCount, removedLines);
+        }
+
+        function updateStats(origChars, cleanChars, origLines, removedLines) {
+            document.getElementById('stat-orig-chars').textContent = origChars.toLocaleString();
+            document.getElementById('stat-clean-chars').textContent = cleanChars.toLocaleString();
+            document.getElementById('stat-orig-lines').textContent = origLines.toLocaleString();
+            document.getElementById('stat-removed-lines').textContent = removedLines.toLocaleString();
+        }
+
+        function copyCleanText() {
+            if (!cleanTextarea.value) return;
+            cleanTextarea.select();
+            document.execCommand('copy');
+            alert("Đã sao chép kết quả vào clipboard!");
+        }
+
+        function downloadCleanTxt() {
+            const text = cleanTextarea.value;
+            if (!text) {
+                alert("Chưa có nội dung để tải về!");
+                return;
+            }
+            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+            saveAs(blob, currentFileName);
+        }
+
+        function clearAllData() {
+            rawTextarea.value = "";
+            cleanTextarea.value = "";
+            fileNameDisplay.textContent = "";
+            currentFileName = "truyen_da_lam_sach.txt";
+            updateStats(0, 0, 0, 0);
+        }
+    </script>
+</body>
+</html>
