@@ -31,6 +31,18 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .drop-active { border-color: #0284c7 !important; background-color: rgba(2, 132, 199, 0.05) !important; }
+        /* Style cho từ khóa được tìm kiếm và bôi sáng */
+        mark.search-highlight {
+            background-color: #fde047;
+            color: #1e293b;
+            padding: 2px 0;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        .dark mark.search-highlight {
+            background-color: #eab308;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800 dark:text-slate-200 font-sans">
@@ -107,7 +119,7 @@
                     <input type="checkbox" id="opt-chapter" class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
                         <span class="font-bold text-sky-800 dark:text-sky-300 block">Chỉ giữ lại tiếng Trung (Xóa chữ "Chương X:")</span>
-                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Tự động xóa phần chữ "Chương 1:" và chỉ giữ lại phần tiếng Trung dạng `第1章`[cite: 9] ở mỗi đầu chương.</span>
+                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Tự động xóa phần chữ "Chương 1:" và chỉ giữ lại phần tiếng Trung dạng `第1章` ở mỗi đầu chương.</span>
                     </div>
                 </label>
 
@@ -175,22 +187,20 @@
                     <textarea id="raw-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Dán văn bản TXT Trung Quốc vào đây hoặc kéo thả file TXT ở bên trái..."></textarea>
                 </div>
 
-                <!-- Khung Đầu Ra (Đã Làm Sạch) -->
+                <!-- Khung Đầu Ra (Đã Làm Sạch) - Sử dụng Div Scroll thông minh hỗ trợ tô màu tìm kiếm -->
                 <div class="flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
                     <div class="bg-slate-100 dark:bg-slate-700/50 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                         <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (CÓ THỂ SỬA TRỰC TIẾP)
+                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (HỖ TRỢ TÌM KIẾM & TÔ MÀU)
                         </span>
                         <div class="flex items-center gap-2">
-                            <button onclick="saveCleanChanges()" class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-medium hover:bg-emerald-100 transition-colors cursor-pointer" title="Cập nhật lại số liệu thống kê sau khi bạn chỉnh sửa thủ công">
-                                <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu thay đổi
-                            </button>
                             <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors cursor-pointer">
                                 <i class="fa-solid fa-copy"></i> Sao chép
                             </button>
                         </div>
                     </div>
-                    <textarea id="clean-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây..."></textarea>
+                    <!-- Vùng chứa nội dung sạch có cuộn và bôi sáng -->
+                    <div id="clean-view" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed overflow-y-auto whitespace-pre-wrap select-text outline-none" contenteditable="true" oninput="syncCleanContent(this.innerText)" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây..."></div>
                 </div>
 
             </div>
@@ -255,7 +265,7 @@
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const rawTextarea = document.getElementById('raw-textarea');
-        const cleanTextarea = document.getElementById('clean-textarea');
+        const cleanView = document.getElementById('clean-view');
         const fileNameDisplay = document.getElementById('file-name-display');
         const statusNotification = document.getElementById('status-notification');
         
@@ -266,6 +276,7 @@
         const btnProcess = document.getElementById('btn-process');
 
         let currentFileName = "truyen_da_lam_sach.txt";
+        let cleanPlainText = ""; // Lưu trữ nội dung text thuần
 
         dropZone.onclick = () => fileInput.click();
         ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('drop-active'); }));
@@ -390,7 +401,8 @@
                 resultText = resultText.split('\n').map(l => l.trim()).join('\n');
             }
 
-            cleanTextarea.value = resultText;
+            cleanPlainText = resultText;
+            cleanView.textContent = resultText;
 
             const finalLines = resultText.split('\n').length;
             const totalRemoved = Math.max(removedCount, origLineCount - finalLines);
@@ -418,18 +430,15 @@
             document.getElementById('stat-removed-lines').textContent = removedLines.toLocaleString();
         }
 
-        function saveCleanChanges() {
-            const cleanText = cleanTextarea.value;
+        function syncCleanContent(text) {
+            cleanPlainText = text;
             const rawText = rawTextarea.value;
-            if (!cleanText) return;
             const origLines = rawText ? rawText.split(/\r?\n/).length : 0;
-            const finalLines = cleanText.split(/\r?\n/).length;
-            updateStats(rawText.length, cleanText.length, origLines, Math.max(0, origLines - finalLines));
-            statusNotification.textContent = "Đã lưu và cập nhật thống kê thành công!";
-            alert("Đã lưu thay đổi thành công!");
+            const finalLines = text.split(/\r?\n/).length;
+            updateStats(rawText.length, text.length, origLines, Math.max(0, origLines - finalLines));
         }
 
-        // --- TÍNH NĂNG TÌM KIẾM ĐÓNG MODAL VÀ TÔ MÀU CHÍNH XÁC ---
+        // --- TÍNH NĂNG TÌM KIẾM VÀ TÔ MÀU (HIGHLIGHT) VÀO ĐÚNG TỪ KHÓA ---
         let currentMatchIndex = -1;
         let matchPositions = [];
 
@@ -438,7 +447,6 @@
 
         function executeWordFind(direction) {
             const keyword = document.getElementById('word-find-input').value;
-            const text = cleanTextarea.value;
             const countDisplay = document.getElementById('find-result-count');
 
             if (!keyword) {
@@ -449,10 +457,10 @@
             if (window.lastKeyword !== keyword) {
                 window.lastKeyword = keyword;
                 matchPositions = [];
-                let idx = text.indexOf(keyword);
+                let idx = cleanPlainText.indexOf(keyword);
                 while (idx !== -1) {
                     matchPositions.push(idx);
-                    idx = text.indexOf(keyword, idx + 1);
+                    idx = cleanPlainText.indexOf(keyword, idx + 1);
                 }
                 currentMatchIndex = -1;
             }
@@ -467,18 +475,24 @@
             if (currentMatchIndex < 0) currentMatchIndex = matchPositions.length - 1;
 
             const pos = matchPositions[currentMatchIndex];
-            
-            // 1. Tự động đóng bảng modal để khung "Kết quả sạch" nhận tiêu điểm (focus) rõ ràng
+
+            // 1. Đóng modal để nhìn rõ kết quả
             closeFindModal();
 
-            // 2. Tập trung vào khung sạch và bôi sáng chính xác vị trí từ khóa
-            cleanTextarea.focus();
-            cleanTextarea.setSelectionRange(pos, pos + keyword.length);
+            // 2. Render lại nội dung, bọc từ khóa hiện tại bằng thẻ <mark> màu vàng nổi bật
+            const before = cleanPlainText.substring(0, pos);
+            const target = cleanPlainText.substring(pos, pos + keyword.length);
+            const after = cleanPlainText.substring(pos + keyword.length);
 
-            // 3. Cuộn khung sạch đến đúng vị trí tìm thấy
-            const linesBefore = text.substring(0, pos).split('\n').length;
-            const lineHeight = 18; 
-            cleanTextarea.scrollTop = Math.max(0, (linesBefore - 6) * lineHeight);
+            cleanView.innerHTML = escapeHtml(before) + `<mark class="search-highlight" id="highlight-target">${escapeHtml(target)}</mark>` + escapeHtml(after);
+
+            // 3. Cuộn mượt màn hình tới đúng vị trí từ khóa được tìm thấy
+            const targetEl = document.getElementById('highlight-target');
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            countDisplay.textContent = `Kết quả ${currentMatchIndex + 1} / ${matchPositions.length}`;
         }
 
         function executeWordReplace() {
@@ -488,29 +502,38 @@
                 alert("Vui lòng nhập từ khóa cần tìm!");
                 return;
             }
-            let text = cleanTextarea.value;
-            const regex = new RegExp(keyword, 'g');
-            cleanTextarea.value = text.replace(regex, replaceVal);
+            const regex = new RegExp(escapeRegExp(keyword), 'g');
+            cleanPlainText = cleanPlainText.replace(regex, replaceVal);
+            cleanView.textContent = cleanPlainText;
             closeFindModal();
-            saveCleanChanges();
+            syncCleanContent(cleanPlainText);
+            alert("Đã thay thế tất cả thành công!");
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
         function copyCleanText() {
-            if (!cleanTextarea.value) return;
-            cleanTextarea.select();
-            document.execCommand('copy');
-            alert("Đã sao chép kết quả sạch vào clipboard!");
+            if (!cleanPlainText) return;
+            navigator.clipboard.writeText(cleanPlainText).then(() => {
+                alert("Đã sao chép kết quả sạch vào clipboard!");
+            });
         }
 
         function downloadCleanTxt() {
-            const text = cleanTextarea.value;
-            if (!text) { alert("Chưa có nội dung sạch để tải về!"); return; }
-            saveAs(new Blob([text], { type: "text/plain;charset=utf-8" }), currentFileName);
+            if (!cleanPlainText) { alert("Chưa có nội dung sạch để tải về!"); return; }
+            saveAs(new Blob([cleanPlainText], { type: "text/plain;charset=utf-8" }), currentFileName);
         }
 
         function clearAllData() {
             rawTextarea.value = "";
-            cleanTextarea.value = "";
+            cleanView.innerHTML = "";
+            cleanPlainText = "";
             fileNameDisplay.textContent = "";
             currentFileName = "truyen_da_lam_sach.txt";
             updateStats(0, 0, 0, 0);
