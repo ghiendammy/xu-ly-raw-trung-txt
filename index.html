@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TXT Cleaner Pro - Dọn Rác Truyện Trung Quốc</title>
+    <title>TXT Raw Cleaner Pro - Dọn Rác Truyện Trung Quốc</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,18 +38,22 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800 dark:text-slate-200 font-sans">
 
+    <!-- Header -->
     <header class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 h-14 flex items-center justify-between px-4 shrink-0 z-10">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-lg">
                 <i class="fa-solid fa-broom-ball"></i>
             </div>
             <div>
-                <h1 class="font-bold text-base md:text-lg leading-tight">TXT Raw Cleaner</h1>
-                <p class="text-[11px] text-slate-400">Chuyên dọn rác truyện Trung Quốc (xbanxia & quảng cáo Anh/Việt)</p>
+                <h1 class="font-bold text-base md:text-lg leading-tight">TXT Raw Cleaner Pro</h1>
+                <p class="text-[11px] text-slate-400">Chuyên dọn rác truyện Trung Quốc (xbanxia & quảng cáo Anh/Việt lẫn lộn)</p>
             </div>
         </div>
         
         <div class="flex items-center gap-2">
+            <button onclick="openFindReplaceModal()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-1.5 px-3 rounded font-medium transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-magnifying-glass"></i> Tìm & Thay Thế
+            </button>
             <button id="theme-toggle" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="Đổi giao diện Sáng/Tối">
                 <i class="fa-solid fa-moon dark:hidden text-slate-600"></i>
                 <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
@@ -60,6 +64,7 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
         <!-- Cột Trái: Control Panel & Options -->
@@ -80,14 +85,14 @@
 
             <!-- Bộ lọc cấu hình dọn dẹp -->
             <div class="space-y-3">
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">2. Bộ lọc dọn rác</label>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">2. Bộ lọc dọn rác chuyên sâu</label>
                 
                 <!-- Option 1: Xbanxia -->
                 <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
                     <input type="checkbox" id="opt-xbanxia" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
                         <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Xbanxia & QC Trung Quốc</span>
-                        <span class="text-slate-400 text-[11px]">Xóa câu "如有惡意廣告...", proton.me, xbanxia, banxia...</span>
+                        <span class="text-slate-400 text-[11px]">Xóa câu chứa "如有惡意廣告", proton.me, xbanxia, banxia...</span>
                     </div>
                 </label>
 
@@ -95,8 +100,8 @@
                 <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
                     <input type="checkbox" id="opt-mixed" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
-                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Anh / Việt tự động</span>
-                        <span class="text-slate-400 text-[11px]">Lọc Sponsored, You May Like, Forex, IC Markets, WPS Office...</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Anh / Việt (Tài chính, Forex, QC)</span>
+                        <span class="text-slate-400 text-[11px]">Lọc Sponsored, You May Like, Forex, IC Markets, Pips, Dow, DAX...</span>
                     </div>
                 </label>
 
@@ -104,21 +109,22 @@
                 <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
                     <input type="checkbox" id="opt-whitespace" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
-                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Chuẩn hóa khoảng trắng</span>
-                        <span class="text-slate-400 text-[11px]">Gộp nhiều dòng trống liên tiếp thành 1 dòng, xóa khoảng trắng thừa</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Chuẩn hóa khoảng trắng & Dòng trống</span>
+                        <span class="text-slate-400 text-[11px]">Gộp nhiều dòng trống liên tiếp thành 1 dòng chuẩn</span>
                     </div>
                 </label>
             </div>
 
-            <!-- Nút Thực Hiện -->
-            <button onclick="processCleanText()" class="w-full bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm mt-auto">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Tiến Hành Dọn Rác
+            <!-- Nút Thực Hiện Chính Thức -->
+            <button onclick="processCleanText()" class="w-full bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm mt-auto cursor-pointer">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Tiến Hành Dọn Rác Ngay
             </button>
         </aside>
 
+        <!-- Cột Phải: Preview & Thống Kê -->
         <section class="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 overflow-hidden p-4 gap-4">
             
-            <!-- Thống kê kết quả -->
+            <!-- Thống kê kết quả chi tiết -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-sm">
                     <p class="text-[11px] font-semibold text-slate-400 uppercase">Ký tự ban đầu</p>
@@ -156,26 +162,58 @@
                 <div class="flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
                     <div class="bg-slate-100 dark:bg-slate-700/50 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                         <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (CÓ THỂ SỬA)
+                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (CÓ THỂ SỬA TRỰC TIẾP)
                         </span>
-                        <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors">
-                            <i class="fa-solid fa-copy"></i> Sao chép
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="saveCleanChanges()" class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-medium hover:bg-emerald-100 transition-colors" title="Cập nhật lại số liệu thống kê sau khi bạn chỉnh sửa thủ công">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu thay đổi
+                            </button>
+                            <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors">
+                                <i class="fa-solid fa-copy"></i> Sao chép
+                            </button>
+                        </div>
                     </div>
-                    <textarea id="clean-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây..."></textarea>
+                    <textarea id="clean-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây. Bạn có thể gõ sửa trực tiếp tại đây..."></textarea>
                 </div>
 
             </div>
 
             <!-- Thanh Tải Về Nhanh -->
-            <div class="flex justify-end items-center gap-3 shrink-0">
-                <button onclick="downloadCleanTxt()" class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 text-sm">
+            <div class="flex justify-between items-center shrink-0">
+                <span id="status-notification" class="text-xs text-slate-400 italic">Sẵn sàng xử lý file văn bản...</span>
+                <button onclick="downloadCleanTxt()" class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-2.5 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 text-sm cursor-pointer">
                     <i class="fa-solid fa-download"></i> Tải File TXT Đã Làm Sạch
                 </button>
             </div>
 
         </section>
     </main>
+
+    <!-- Modal Tìm & Thay Thế -->
+    <div id="find-replace-modal" class="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full p-5 mx-4 border border-slate-200 dark:border-slate-700 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-sm text-sky-600 dark:text-sky-400 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass"></i> Tìm & Thay Thế Nhanh Trong Kết Quả
+                </h3>
+                <button onclick="closeFindReplaceModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Từ khóa cần tìm</label>
+                    <input type="text" id="find-input" placeholder="Ví dụ: từ ngữ cần xóa hoặc đổi..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Thay thế thành</label>
+                    <input type="text" id="replace-input" placeholder="Để trống nếu muốn xóa sạch từ đó..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-500">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeFindReplaceModal()" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xs font-medium">Đóng</button>
+                <button onclick="executeFindReplace()" class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium">Thay Thế Toàn Bộ</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // --- Dark mode logic ---
@@ -194,6 +232,7 @@
         const rawTextarea = document.getElementById('raw-textarea');
         const cleanTextarea = document.getElementById('clean-textarea');
         const fileNameDisplay = document.getElementById('file-name-display');
+        const statusNotification = document.getElementById('status-notification');
 
         let currentFileName = "truyen_da_lam_sach.txt";
 
@@ -228,29 +267,22 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 rawTextarea.value = e.target.result;
+                statusNotification.textContent = `Đã tải file "${file.name}" thành công. Hãy bấm "Tiến Hành Dọn Rác Ngay".`;
                 processCleanText();
             };
             reader.readAsText(file);
         }
 
-        // Tự động tính toán lại khi gõ trực tiếp vào raw
-        rawTextarea.addEventListener('input', () => {
-            processCleanText();
-        });
-
-        // --- DANH SÁCH MẪU RÁC CẦN LỌC TRIỆT ĐỂ ---
-        
-        // 1. Dạng rác Xbanxia & QC Trung Quốc
+        // --- DANH SÁCH MẪU RÁC CHUYÊN SÂU ---
         const XBANXIA_REGEXES = [
-            /如有惡意廣告.*xbanxia@proton\.me/gi,
-            /如有惡意廣告.*請將截屏或錄屏發送至.*/gi,
+            /如有惡意廣告[^\n]*xbanxia@proton\.me[^\n]*/gi,
+            /如有惡意廣告[^\n]*/gi,
             /xbanxia@proton\.me/gi,
             /xbanxia/gi,
             /banxia/gi,
-            /【.*惡意廣告.*】/gi
+            /【\s*如有惡意廣告\s*】/gi
         ];
 
-        // 2. Dạng rác Tiếng Anh & Tiếng Việt quảng cáo (English/Vietnamese mix noise)
         const MIXED_JUNK_REGEXES = [
             /You May Like/gi,
             /Sponsored/gi,
@@ -262,21 +294,21 @@
             /IC\s*\|\s*Sponsored/gi,
             /C’est légal/gi,
             /WPS Office/gi,
-            /Thưởng Nạp Đến 5\.000 USD/gi,
+            /Thưởng Nạp Đến [0-9,\.]+\s*(USD|VND)/gi,
             /Tải Về/gi,
             /Hợp đồng tương lai/gi,
             /Dow,\s*DAX/gi,
             /FTSE/gi,
             /S&P/gi,
-            /Tài khoản Demo/gi
+            /Tài khoản Demo/gi,
+            /撤消/gi
         ];
 
-        // --- THUẬT TOÁN XỬ LÝ LÀM SẠCH VĂN BẢN ---
+        // --- NÚT TIẾN HÀNH DỌN RÁC ---
         function processCleanText() {
             const rawText = rawTextarea.value;
             if (!rawText.trim()) {
-                cleanTextarea.value = "";
-                updateStats(0, 0, 0, 0);
+                alert("Vui lòng dán văn bản hoặc tải file TXT vào khung bên trái trước!");
                 return;
             }
 
@@ -287,45 +319,57 @@
             let lines = rawText.split(/\r?\n/);
             const origLineCount = lines.length;
             let cleanedLines = [];
+            let removedCount = 0;
 
             lines.forEach(line => {
                 let currentLine = line;
+                let isTrashLine = false;
 
-                // Lọc loại 1: Xbanxia & QC Trung Quốc
+                // Kiểm tra loại 1: Xbanxia
                 if (cleanXbanxia) {
-                    XBANXIA_REGEXES.forEach(reg => {
-                        currentLine = currentLine.replace(reg, '');
-                    });
+                    for (let reg of XBANXIA_REGEXES) {
+                        if (reg.test(currentLine)) {
+                            isTrashLine = true;
+                            currentLine = currentLine.replace(reg, '');
+                        }
+                    }
                 }
 
-                // Lọc loại 2: Anh/Việt quảng cáo
+                // Kiểm tra loại 2: Anh/Việt quảng cáo
                 if (cleanMixed) {
-                    MIXED_JUNK_REGEXES.forEach(reg => {
-                        currentLine = currentLine.replace(reg, '');
-                    });
+                    for (let reg of MIXED_JUNK_REGEXES) {
+                        if (reg.test(currentLine)) {
+                            isTrashLine = true;
+                            currentLine = currentLine.replace(reg, '');
+                        }
+                    }
                 }
 
-                // Nếu dòng chỉ chứa khoảng trắng sau khi dọn bớt rác, xem như dòng trống
+                // Nếu sau khi lọc mà dòng trống hoặc hoàn toàn chứa rác dính kèm
+                if (isTrashLine && currentLine.trim() === "") {
+                    removedCount++;
+                    return; // Bỏ qua dòng này
+                }
+
                 cleanedLines.push(currentLine);
             });
 
             let resultText = cleanedLines.join('\n');
 
-            // Lọc loại 3: Chuẩn hóa khoảng trắng & dòng trống
+            // Lọc loại 3: Chuẩn hóa khoảng trắng & dòng trống thừa
             if (cleanWhitespace) {
-                // Thay thế nhiều dòng trống liên tiếp (3 dòng trở lên) thành 1 dòng trống chuẩn
                 resultText = resultText.replace(/\n\s*\n\s*\n+/g, '\n\n');
-                // Xóa khoảng trắng thừa ở đầu/cuối mỗi dòng
                 resultText = resultText.split('\n').map(l => l.trim()).join('\n');
             }
 
             cleanTextarea.value = resultText;
 
-            // Thống kê
+            // Thống kê chính xác
             const finalLines = resultText.split('\n').length;
-            const removedLines = Math.max(0, origLineCount - finalLines);
+            const totalRemoved = Math.max(removedCount, origLineCount - finalLines);
 
-            updateStats(rawText.length, resultText.length, origLineCount, removedLines);
+            updateStats(rawText.length, resultText.length, origLineCount, totalRemoved);
+            statusNotification.textContent = `Đã dọn sạch thành công! Đã loại bỏ ${totalRemoved} dòng rác.`;
         }
 
         function updateStats(origChars, cleanChars, origLines, removedLines) {
@@ -335,17 +379,50 @@
             document.getElementById('stat-removed-lines').textContent = removedLines.toLocaleString();
         }
 
+        // --- LƯU THAY ĐỔI SAU KHI SỬA THỦ CÔNG ---
+        function saveCleanChanges() {
+            const cleanText = cleanTextarea.value;
+            const rawText = rawTextarea.value;
+            if (!cleanText) return;
+            const origLines = rawText ? rawText.split(/\r?\n/).length : 0;
+            const finalLines = cleanText.split(/\r?\n/).length;
+            updateStats(rawText.length, cleanText.length, origLines, Math.max(0, origLines - finalLines));
+            statusNotification.textContent = "Đã lưu và cập nhật lại thống kê theo nội dung bạn vừa chỉnh sửa!";
+            alert("Đã lưu thay đổi thành công!");
+        }
+
+        // --- TÌM & THAY THẾ ---
+        function openFindReplaceModal() {
+            document.getElementById('find-replace-modal').classList.remove('hidden');
+        }
+        function closeFindReplaceModal() {
+            document.getElementById('find-replace-modal').classList.add('hidden');
+        }
+        function executeFindReplace() {
+            const findVal = document.getElementById('find-input').value;
+            const replaceVal = document.getElementById('replace-input').value;
+            if (!findVal) {
+                alert("Vui lòng nhập từ khóa cần tìm!");
+                return;
+            }
+            let text = cleanTextarea.value;
+            const regex = new RegExp(findVal, 'g');
+            cleanTextarea.value = text.replace(regex, replaceVal);
+            closeFindReplaceModal();
+            saveCleanChanges();
+        }
+
         function copyCleanText() {
             if (!cleanTextarea.value) return;
             cleanTextarea.select();
             document.execCommand('copy');
-            alert("Đã sao chép kết quả vào clipboard!");
+            alert("Đã sao chép kết quả sạch vào clipboard!");
         }
 
         function downloadCleanTxt() {
             const text = cleanTextarea.value;
             if (!text) {
-                alert("Chưa có nội dung để tải về!");
+                alert("Chưa có nội dung sạch để tải về!");
                 return;
             }
             const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -358,6 +435,7 @@
             fileNameDisplay.textContent = "";
             currentFileName = "truyen_da_lam_sach.txt";
             updateStats(0, 0, 0, 0);
+            statusNotification.textContent = "Đã làm mới toàn bộ không gian làm việc.";
         }
     </script>
 </body>
