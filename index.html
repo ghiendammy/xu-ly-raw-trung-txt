@@ -48,14 +48,14 @@
         </div>
         
         <div class="flex items-center gap-2">
-            <button onclick="openFindModal()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-1.5 px-3 rounded font-medium transition-colors flex items-center gap-1.5">
-                <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm & Thay thế (Kết quả sạch)
+            <button onclick="openFindModal()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 py-1.5 px-3 rounded font-medium transition-colors flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm & Thay thế
             </button>
-            <button id="theme-toggle" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="Đổi giao diện Sáng/Tối">
+            <button id="theme-toggle" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer" title="Đổi giao diện Sáng/Tối">
                 <i class="fa-solid fa-moon dark:hidden text-slate-600"></i>
                 <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
             </button>
-            <button onclick="clearAllData()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 text-slate-600 dark:text-slate-300 py-1.5 px-3 rounded font-medium transition-colors">
+            <button onclick="clearAllData()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 text-slate-600 dark:text-slate-300 py-1.5 px-3 rounded font-medium transition-colors cursor-pointer">
                 <i class="fa-solid fa-rotate-left mr-1"></i> Làm mới
             </button>
         </div>
@@ -182,10 +182,10 @@
                             <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (CÓ THỂ SỬA TRỰC TIẾP)
                         </span>
                         <div class="flex items-center gap-2">
-                            <button onclick="saveCleanChanges()" class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-medium hover:bg-emerald-100 transition-colors" title="Cập nhật lại số liệu thống kê sau khi bạn chỉnh sửa thủ công">
+                            <button onclick="saveCleanChanges()" class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-medium hover:bg-emerald-100 transition-colors cursor-pointer" title="Cập nhật lại số liệu thống kê sau khi bạn chỉnh sửa thủ công">
                                 <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu thay đổi
                             </button>
-                            <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors">
+                            <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors cursor-pointer">
                                 <i class="fa-solid fa-copy"></i> Sao chép
                             </button>
                         </div>
@@ -206,14 +206,14 @@
         </section>
     </main>
 
-    <!-- Modal Tìm Kiếm & Thay Thế (Chuẩn Word trên Kết quả sạch) -->
+    <!-- Modal Tìm Kiếm & Thay Thế -->
     <div id="find-modal" class="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center hidden">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-md w-full p-5 mx-4 border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-sm text-sky-600 dark:text-sky-400 flex items-center gap-2">
                     <i class="fa-solid fa-magnifying-glass"></i> Tìm Kiếm & Thay Thế Trên Kết Quả Sạch
                 </h3>
-                <button onclick="closeFindModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeFindModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-3">
                 <div>
@@ -340,7 +340,6 @@
                     let currentLine = line;
                     let isTrash = false;
 
-                    // 1. Lọc Xbanxia
                     if (cleanXbanxia) {
                         for (let reg of XBANXIA_REGEXES) {
                             if (reg.test(currentLine)) {
@@ -350,7 +349,6 @@
                         }
                     }
 
-                    // 2. Lọc QC tài chính dài
                     if (cleanAds) {
                         const lowerLine = currentLine.toLowerCase();
                         const hasAds = ADS_KEYWORDS.some(kw => lowerLine.includes(kw));
@@ -360,7 +358,6 @@
                         }
                     }
 
-                    // 3. Xóa phần chữ "Chương X:", giữ lại 第X章
                     if (cleanChapter) {
                         currentLine = currentLine.replace(/chương\s*\d+[\s:\-]*/gi, '');
                     }
@@ -432,7 +429,7 @@
             alert("Đã lưu thay đổi thành công!");
         }
 
-        // --- TÍNH NĂNG TÌM KIẾM & THAY THẾ CHÍNH XÁC TRÊN KHUNG KẾT QUẢ SẠCH ---
+        // --- TÍNH NĂNG TÌM KIẾM ĐÓNG MODAL VÀ TÔ MÀU CHÍNH XÁC ---
         let currentMatchIndex = -1;
         let matchPositions = [];
 
@@ -471,16 +468,17 @@
 
             const pos = matchPositions[currentMatchIndex];
             
-            // Ép con trỏ tập trung và bôi sáng chính xác trong khung "Kết quả sạch"
+            // 1. Tự động đóng bảng modal để khung "Kết quả sạch" nhận tiêu điểm (focus) rõ ràng
+            closeFindModal();
+
+            // 2. Tập trung vào khung sạch và bôi sáng chính xác vị trí từ khóa
             cleanTextarea.focus();
             cleanTextarea.setSelectionRange(pos, pos + keyword.length);
 
-            // Tính toán vị trí dòng để cuộn khung sạch tới đúng chỗ đó
+            // 3. Cuộn khung sạch đến đúng vị trí tìm thấy
             const linesBefore = text.substring(0, pos).split('\n').length;
-            const lineHeight = 18; // Chiều cao ước tính mỗi dòng pixel
+            const lineHeight = 18; 
             cleanTextarea.scrollTop = Math.max(0, (linesBefore - 6) * lineHeight);
-
-            countDisplay.textContent = `Kết quả ${currentMatchIndex + 1} / ${matchPositions.length}`;
         }
 
         function executeWordReplace() {
