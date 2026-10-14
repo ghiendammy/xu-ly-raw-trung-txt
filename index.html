@@ -43,7 +43,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-base md:text-lg leading-tight">TXT Raw Cleaner Pro</h1>
-                <p class="text-[11px] text-slate-400">Chuyên dọn rác Xbanxia & Triệt tiêu các câu quảng cáo tiếng Việt dài</p>
+                <p class="text-[11px] text-slate-400">Chuyên dọn rác Xbanxia, QC tài chính & Tên chương song ngữ</p>
             </div>
         </div>
         
@@ -94,15 +94,24 @@
                 </label>
 
                 <!-- Option 2: Lọc các câu quảng cáo tiếng Việt dài thòn (Tài chính, Forex...) -->
-                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-sky-300 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20 cursor-pointer">
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
                     <input type="checkbox" id="opt-ads" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
-                        <span class="font-bold text-sky-800 dark:text-sky-300 block">Xóa câu quảng cáo tiếng Việt dài (Tài chính, Forex)</span>
-                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Quét chính xác các câu dài chứa cụm từ rác, tuyệt đối an toàn cho tên nhân vật.</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa câu quảng cáo tiếng Việt dài (Tài chính, Forex)</span>
+                        <span class="text-slate-400 text-[11px]">Quét chính xác các câu dài chứa cụm từ rác, an toàn cho nhân vật.</span>
                     </div>
                 </label>
 
-                <!-- Option 3: Chuẩn hóa khoảng trắng & dòng trống -->
+                <!-- Option 3: Xóa tên chương song ngữ (Chương X: 第X章) -->
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-sky-300 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20 cursor-pointer">
+                    <input type="checkbox" id="opt-chapter" class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
+                    <div class="text-xs">
+                        <span class="font-bold text-sky-800 dark:text-sky-300 block">Xóa tên chương song ngữ (Chương X: 第X章)</span>
+                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Tự động xóa các dòng định dạng kiểu "Chương 1: 第1章"[cite: 9] hoặc tương tự nếu bạn không muốn giữ lại.</span>
+                    </div>
+                </label>
+
+                <!-- Option 4: Chuẩn hóa khoảng trắng & dòng trống -->
                 <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
                     <input type="checkbox" id="opt-whitespace" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
@@ -295,6 +304,9 @@
             "đòn bẩy linh hoạt", "rủi ro đáng kể", "ic |", "sponsored", "you may like"
         ];
 
+        // Regex nhận diện dòng tên chương song ngữ (VD: Chương 1: 第1章)
+        const CHAPTER_REGEX = /^[\s]*(chương\s*\d+[:\s\-]*第?\s*\d+\s*章|第\s*\d+\s*章[:\s\-]*chương\s*\d+)/i;
+
         async function processCleanText() {
             const rawText = rawTextarea.value;
             if (!rawText.trim()) {
@@ -304,6 +316,7 @@
 
             const cleanXbanxia = document.getElementById('opt-xbanxia').checked;
             const cleanAds = document.getElementById('opt-ads').checked;
+            const cleanChapter = document.getElementById('opt-chapter').checked;
             const cleanWhitespace = document.getElementById('opt-whitespace').checked;
 
             btnProcess.disabled = true;
@@ -311,7 +324,7 @@
             progressContainer.classList.remove('hidden');
             progressBar.style.width = '0%';
             progressPercent.textContent = '0%';
-            progressStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang khởi tạo bộ lọc quảng cáo chuyên sâu...`;
+            progressStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang khởi tạo bộ lọc chuyên sâu...`;
 
             await new Promise(r => setTimeout(r, 100));
 
@@ -330,6 +343,7 @@
                     let currentLine = line;
                     let isTrash = false;
 
+                    // 1. Lọc Xbanxia
                     if (cleanXbanxia) {
                         for (let reg of XBANXIA_REGEXES) {
                             if (reg.test(currentLine)) {
@@ -339,6 +353,7 @@
                         }
                     }
 
+                    // 2. Lọc QC tài chính dài
                     if (cleanAds) {
                         const lowerLine = currentLine.toLowerCase();
                         const hasAds = ADS_KEYWORDS.some(kw => lowerLine.includes(kw));
@@ -346,6 +361,12 @@
                             isTrash = true;
                             currentLine = '';
                         }
+                    }
+
+                    // 3. Lọc tên chương song ngữ (Chương X: 第X章)
+                    if (cleanChapter && CHAPTER_REGEX.test(currentLine.trim())) {
+                        isTrash = true;
+                        currentLine = '';
                     }
 
                     if (isTrash && currentLine.trim() === "") {
@@ -415,7 +436,6 @@
             alert("Đã lưu thay đổi thành công!");
         }
 
-        // --- TÍNH NĂNG TÌM KIẾM & THAY THẾ GIỐNG WORD ---
         let currentMatchIndex = -1;
         let matchPositions = [];
 
