@@ -43,7 +43,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-base md:text-lg leading-tight">TXT Raw Cleaner Pro</h1>
-                <p class="text-[11px] text-slate-400">Chuyên dọn rác Xbanxia, QC tài chính & Tên chương song ngữ</p>
+                <p class="text-[11px] text-slate-400">Chuyên dọn rác Xbanxia, QC tài chính & Định dạng tên chương</p>
             </div>
         </div>
         
@@ -102,12 +102,12 @@
                     </div>
                 </label>
 
-                <!-- Option 3: Xóa tên chương song ngữ (Chương X: 第X章) -->
+                <!-- Option 3: Xóa phần chữ Việt, giữ lại 第X章 -->
                 <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-sky-300 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20 cursor-pointer">
                     <input type="checkbox" id="opt-chapter" class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
-                        <span class="font-bold text-sky-800 dark:text-sky-300 block">Xóa tên chương song ngữ (Chương X: 第X章)</span>
-                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Tự động xóa các dòng định dạng kiểu "Chương 1: 第1章"[cite: 9] hoặc tương tự nếu bạn không muốn giữ lại.</span>
+                        <span class="font-bold text-sky-800 dark:text-sky-300 block">Chỉ giữ lại tiếng Trung (Xóa chữ "Chương X:")</span>
+                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Tự động xóa phần chữ "Chương 1:"[cite: 9] và chỉ giữ lại phần tiếng Trung dạng `第1章`[cite: 9] ở mỗi đầu chương.</span>
                     </div>
                 </label>
 
@@ -304,9 +304,6 @@
             "đòn bẩy linh hoạt", "rủi ro đáng kể", "ic |", "sponsored", "you may like"
         ];
 
-        // Regex nhận diện dòng tên chương song ngữ (VD: Chương 1: 第1章)
-        const CHAPTER_REGEX = /^[\s]*(chương\s*\d+[:\s\-]*第?\s*\d+\s*章|第\s*\d+\s*章[:\s\-]*chương\s*\d+)/i;
-
         async function processCleanText() {
             const rawText = rawTextarea.value;
             if (!rawText.trim()) {
@@ -363,10 +360,10 @@
                         }
                     }
 
-                    // 3. Lọc tên chương song ngữ (Chương X: 第X章)
-                    if (cleanChapter && CHAPTER_REGEX.test(currentLine.trim())) {
-                        isTrash = true;
-                        currentLine = '';
+                    // 3. Xóa phần chữ "Chương X:", giữ lại "第X章"[cite: 9]
+                    if (cleanChapter) {
+                        // Regex tìm phần kiểu "Chương 1:" hoặc "Chương 1 -" và loại bỏ nó, giữ lại phần 第X章[cite: 9]
+                        currentLine = currentLine.replace(/chương\s*\d+[\s:\-]*/gi, '');
                     }
 
                     if (isTrash && currentLine.trim() === "") {
