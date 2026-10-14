@@ -13,10 +13,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'Segoe UI', 'sans-serif'] },
-                    colors: {
-                        primary: '#0284c7',
-                        'primary-hover': '#0369a1'
-                    }
+                    colors: { primary: '#0284c7' }
                 }
             }
         }
@@ -46,7 +43,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-base md:text-lg leading-tight">TXT Raw Cleaner Pro</h1>
-                <p class="text-[11px] text-slate-400">Chuyên dọn rác truyện Trung Quốc (xbanxia & quảng cáo Anh/Việt lẫn lộn)</p>
+                <p class="text-[11px] text-slate-400">Chuyên dọn rác Xbanxia & Quảng cáo Anh/Việt chuẩn xác (Không sợ nhầm tên nhân vật)</p>
             </div>
         </div>
         
@@ -92,16 +89,16 @@
                     <input type="checkbox" id="opt-xbanxia" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
                         <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Xbanxia & QC Trung Quốc</span>
-                        <span class="text-slate-400 text-[11px]">Xóa câu chứa "如有惡意廣告", proton.me, xbanxia, banxia...</span>
+                        <span class="text-slate-400 text-[11px]">Xóa câu chứa "如有惡意廣告", proton.me, xbanxia...</span>
                     </div>
                 </label>
 
-                <!-- Option 2: Anh / Việt Lẫn Lộn -->
-                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer">
+                <!-- Option 2: Lọc rác Tài chính / Quảng cáo Anh-Việt thông minh -->
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-sky-300 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-950/20 cursor-pointer">
                     <input type="checkbox" id="opt-mixed" checked class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 w-4 h-4">
                     <div class="text-xs">
-                        <span class="font-bold text-slate-800 dark:text-slate-100 block">Xóa rác Anh / Việt (Tài chính, Forex, QC)</span>
-                        <span class="text-slate-400 text-[11px]">Lọc Sponsored, You May Like, Forex, IC Markets, Pips, Dow, DAX...</span>
+                        <span class="font-bold text-sky-800 dark:text-sky-300 block">Lọc rác QC / Tài chính Anh - Việt</span>
+                        <span class="text-slate-500 dark:text-slate-400 text-[11px]">Tự động phát hiện các cụm từ quảng cáo tiếng Việt có dấu lẫn tiếng Anh (Forex, IC Markets, Dow, DAX, giao dịch toàn cầu...) mà vẫn giữ nguyên tên nhân vật.</span>
                     </div>
                 </label>
 
@@ -144,7 +141,7 @@
                 </div>
             </div>
 
-            <!-- Thanh Progress Bar hiển thị tiến trình xóa file nặng -->
+            <!-- Thanh Progress Bar hiển thị tiến trình -->
             <div id="progress-container" class="hidden bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-900 rounded-xl p-3 shadow-sm flex flex-col gap-1.5">
                 <div class="flex justify-between items-center text-xs font-semibold text-sky-700 dark:text-sky-300">
                     <span id="progress-status"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang xử lý dọn rác...</span>
@@ -184,7 +181,7 @@
                             </button>
                         </div>
                     </div>
-                    <textarea id="clean-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây. Bạn có thể gõ sửa trực tiếp tại đây..."></textarea>
+                    <textarea id="clean-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây..."></textarea>
                 </div>
 
             </div>
@@ -212,11 +209,11 @@
             <div class="space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Từ khóa cần tìm</label>
-                    <input type="text" id="find-input" placeholder="Ví dụ: từ ngữ cần xóa hoặc đổi..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-500">
+                    <input type="text" id="find-input" placeholder="Ví dụ..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Thay thế thành</label>
-                    <input type="text" id="replace-input" placeholder="Để trống nếu muốn xóa sạch từ đó..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-500">
+                    <input type="text" id="replace-input" placeholder="Để trống nếu muốn xóa sạch..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-500">
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
@@ -227,7 +224,6 @@
     </div>
 
     <script>
-        // --- Dark mode logic ---
         const htmlEl = document.documentElement;
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             htmlEl.classList.add('dark');
@@ -237,7 +233,6 @@
             localStorage.theme = htmlEl.classList.contains('dark') ? 'dark' : 'light';
         };
 
-        // --- Core Elements ---
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const rawTextarea = document.getElementById('raw-textarea');
@@ -253,38 +248,20 @@
 
         let currentFileName = "truyen_da_lam_sach.txt";
 
-        // Drag & Drop handlers
         dropZone.onclick = () => fileInput.click();
-
-        ['dragenter', 'dragover'].forEach(evt => {
-            dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.add('drop-active'); });
-        });
-
-        ['dragleave', 'drop'].forEach(evt => {
-            dropZone.addEventListener(evt, (e) => { e.preventDefault(); dropZone.classList.remove('drop-active'); });
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            const files = e.dataTransfer.files;
-            if (files.length > 0) handleFileSelect(files[0]);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) handleFileSelect(e.target.files[0]);
-        });
+        ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('drop-active'); }));
+        ['dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('drop-active'); }));
+        dropZone.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFileSelect(e.target.files[0]); });
 
         function handleFileSelect(file) {
-            if (!file.name.endsWith('.txt')) {
-                alert("Vui lòng chỉ chọn file dạng .txt!");
-                return;
-            }
+            if (!file.name.endsWith('.txt')) { alert("Vui lòng chỉ chọn file .txt!"); return; }
             currentFileName = file.name.replace('.txt', '_clean.txt');
             fileNameDisplay.textContent = file.name;
-
             statusNotification.textContent = `Đang đọc file "${file.name}"...`;
             
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = e => {
                 rawTextarea.value = e.target.result;
                 const lineCount = e.target.result.split(/\r?\n/).length;
                 updateStats(e.target.result.length, 0, lineCount, 0);
@@ -293,42 +270,27 @@
             reader.readAsText(file);
         }
 
-        // --- DANH SÁCH MẪU RÁC CHUYÊN SÂU ---
         const XBANXIA_REGEXES = [
             /如有惡意廣告[^\n]*xbanxia@proton\.me[^\n]*/gi,
             /如有惡意廣告[^\n]*/gi,
             /xbanxia@proton\.me/gi,
             /xbanxia/gi,
-            /banxia/gi,
-            /【\s*如有惡意廣告\s*】/gi
+            /banxia/gi
         ];
 
-        const MIXED_JUNK_REGEXES = [
-            /You May Like/gi,
-            /Sponsored/gi,
-            /Giao dịch Forex/gi,
-            /Giao dịch chứng khoán/gi,
-            /Spread cạnh tranh/gi,
-            /Thanh khoản sâu/gi,
-            /Đã đến lúc giao dịch/gi,
-            /IC\s*\|\s*Sponsored/gi,
-            /C’est légal/gi,
-            /WPS Office/gi,
-            /Thưởng Nạp Đến [0-9,\.]+\s*(USD|VND)/gi,
-            /Tải Về/gi,
-            /Hợp đồng tương lai/gi,
-            /Dow,\s*DAX/gi,
-            /FTSE/gi,
-            /S&P/gi,
-            /Tài khoản Demo/gi,
-            /撤消/gi
+        // Danh sách các cụm từ khóa tài chính, chứng khoán, quảng cáo Anh/Việt thường dính vào web lậu
+        const MIXED_JUNK_KEYWORDS = [
+            "giao dịch", "chứng khoán", "tài chính", "thị trường", "toàn cầu", 
+            "biến động", "khớp lệnh", "hoa hồng", "pips", "spread", "đòn bẩy", 
+            "ic markets", "sponsored", "you may like", "wps office", "thưởng nạp", 
+            "tài khoản demo", "hợp đồng tương lai", "dow", "dax", "ftse", "s&p", "撤消"
         ];
 
-        // --- NÚT TIẾN HÀNH DỌN RÁC (CÓ THANH TIẾN TRÌNH) ---
+        // --- HÀM XỬ LÝ CHÍNH CÓ TIẾN TRÌNH & AN TOÀN TÊN NHÂN VẬT ---
         async function processCleanText() {
             const rawText = rawTextarea.value;
             if (!rawText.trim()) {
-                alert("Vui lòng dán văn bản hoặc tải file TXT vào khung bên trái trước!");
+                alert("Vui lòng tải file TXT hoặc dán văn bản vào khung trước!");
                 return;
             }
 
@@ -336,22 +298,21 @@
             const cleanMixed = document.getElementById('opt-mixed').checked;
             const cleanWhitespace = document.getElementById('opt-whitespace').checked;
 
-            // Hiển thị giao diện Tiến trình
             btnProcess.disabled = true;
             btnProcess.classList.add('opacity-50', 'cursor-not-allowed');
             progressContainer.classList.remove('hidden');
             progressBar.style.width = '0%';
             progressPercent.textContent = '0%';
-            progressStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang chuẩn bị phân tích dữ liệu...`;
+            progressStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Đang khởi tạo bộ lọc thông minh...`;
 
-            await new Promise(r => setTimeout(r, 50));
+            await new Promise(r => setTimeout(r, 60));
 
             let lines = rawText.split(/\r?\n/);
             const origLineCount = lines.length;
             let cleanedLines = [];
             let removedCount = 0;
 
-            const chunkSize = 2500; // Xử lý từng khối 2500 dòng để không đơ trình duyệt
+            const chunkSize = 3000;
             let processedLines = 0;
 
             for (let i = 0; i < origLineCount; i += chunkSize) {
@@ -359,27 +320,31 @@
                 
                 chunk.forEach(line => {
                     let currentLine = line;
-                    let isTrashLine = false;
+                    let isTrash = false;
 
+                    // 1. Lọc Xbanxia
                     if (cleanXbanxia) {
                         for (let reg of XBANXIA_REGEXES) {
                             if (reg.test(currentLine)) {
-                                isTrashLine = true;
+                                isTrash = true;
                                 currentLine = currentLine.replace(reg, '');
                             }
                         }
                     }
 
+                    // 2. Lọc rác QC / Tài chính Anh - Việt dựa trên từ khóa nhận diện chuyên sâu
                     if (cleanMixed) {
-                        for (let reg of MIXED_JUNK_REGEXES) {
-                            if (reg.test(currentLine)) {
-                                isTrashLine = true;
-                                currentLine = currentLine.replace(reg, '');
-                            }
+                        const lowerLine = currentLine.toLowerCase();
+                        // Kiểm tra nếu dòng chứa từ khóa quảng cáo đặc trưng
+                        const matchJunk = MIXED_JUNK_KEYWORDS.some(kw => lowerLine.includes(kw));
+                        // Hoặc dòng có sự kết hợp bất thường giữa tiếng Anh dài và các từ tiếp thị rác
+                        if (matchJunk || (lowerLine.includes("ic |") && lowerLine.includes("sponsored"))) {
+                            isTrash = true;
+                            currentLine = '';
                         }
                     }
 
-                    if (isTrashLine && currentLine.trim() === "") {
+                    if (isTrash && currentLine.trim() === "") {
                         removedCount++;
                         return;
                     }
@@ -392,13 +357,12 @@
                 
                 progressBar.style.width = percent + '%';
                 progressPercent.textContent = percent + '%';
-                progressStatus.innerHTML = `<i class="fa-solid fa-broom fa-spin mr-1"></i> Đang dọn rác... (${processedLines.toLocaleString()}/${origLineCount.toLocaleString()} dòng)`;
+                progressStatus.innerHTML = `<i class="fa-solid fa-broom fa-spin mr-1"></i> Đang quét rác... (${processedLines.toLocaleString()}/${origLineCount.toLocaleString()} dòng)`;
 
-                // Nhường UI cập nhật tiến trình
                 await new Promise(r => setTimeout(r, 0));
             }
 
-            progressStatus.innerHTML = `<i class="fa-solid fa-align-left mr-1"></i> Đang chuẩn hóa định dạng dòng...`;
+            progressStatus.innerHTML = `<i class="fa-solid fa-align-left mr-1"></i> Đang chuẩn hóa khoảng trắng...`;
             await new Promise(r => setTimeout(r, 10));
 
             let resultText = cleanedLines.join('\n');
@@ -415,7 +379,6 @@
 
             updateStats(rawText.length, resultText.length, origLineCount, totalRemoved);
             
-            // Hoàn tất tiến trình
             progressBar.style.width = '100%';
             progressPercent.textContent = '100%';
             progressStatus.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Hoàn tất dọn rác thành công!`;
@@ -427,7 +390,7 @@
 
             setTimeout(() => {
                 progressContainer.classList.add('hidden');
-            }, 3000);
+            }, 3500);
         }
 
         function updateStats(origChars, cleanChars, origLines, removedLines) {
@@ -437,7 +400,6 @@
             document.getElementById('stat-removed-lines').textContent = removedLines.toLocaleString();
         }
 
-        // --- LƯU THAY ĐỔI SAU KHI SỬA THỦ CÔNG ---
         function saveCleanChanges() {
             const cleanText = cleanTextarea.value;
             const rawText = rawTextarea.value;
@@ -445,27 +407,17 @@
             const origLines = rawText ? rawText.split(/\r?\n/).length : 0;
             const finalLines = cleanText.split(/\r?\n/).length;
             updateStats(rawText.length, cleanText.length, origLines, Math.max(0, origLines - finalLines));
-            statusNotification.textContent = "Đã lưu và cập nhật lại thống kê theo nội dung bạn vừa chỉnh sửa!";
+            statusNotification.textContent = "Đã lưu và cập nhật thống kê thành công!";
             alert("Đã lưu thay đổi thành công!");
         }
 
-        // --- TÌM & THAY THẾ ---
-        function openFindReplaceModal() {
-            document.getElementById('find-replace-modal').classList.remove('hidden');
-        }
-        function closeFindReplaceModal() {
-            document.getElementById('find-replace-modal').classList.add('hidden');
-        }
+        function openFindReplaceModal() { document.getElementById('find-replace-modal').classList.remove('hidden'); }
+        function closeFindReplaceModal() { document.getElementById('find-replace-modal').classList.add('hidden'); }
         function executeFindReplace() {
             const findVal = document.getElementById('find-input').value;
             const replaceVal = document.getElementById('replace-input').value;
-            if (!findVal) {
-                alert("Vui lòng nhập từ khóa cần tìm!");
-                return;
-            }
-            let text = cleanTextarea.value;
-            const regex = new RegExp(findVal, 'g');
-            cleanTextarea.value = text.replace(regex, replaceVal);
+            if (!findVal) { alert("Vui lòng nhập từ khóa cần tìm!"); return; }
+            cleanTextarea.value = cleanTextarea.value.replace(new RegExp(findVal, 'g'), replaceVal);
             closeFindReplaceModal();
             saveCleanChanges();
         }
@@ -479,12 +431,8 @@
 
         function downloadCleanTxt() {
             const text = cleanTextarea.value;
-            if (!text) {
-                alert("Chưa có nội dung sạch để tải về!");
-                return;
-            }
-            const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-            saveAs(blob, currentFileName);
+            if (!text) { alert("Chưa có nội dung sạch để tải về!"); return; }
+            saveAs(new Blob([text], { type: "text/plain;charset=utf-8" }), currentFileName);
         }
 
         function clearAllData() {
@@ -494,7 +442,7 @@
             currentFileName = "truyen_da_lam_sach.txt";
             updateStats(0, 0, 0, 0);
             progressContainer.classList.add('hidden');
-            statusNotification.textContent = "Đã làm mới toàn bộ không gian làm việc.";
+            statusNotification.textContent = "Đã làm mới không gian làm việc.";
         }
     </script>
 </body>
