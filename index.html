@@ -187,19 +187,22 @@
                     <textarea id="raw-textarea" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed outline-none resize-none" placeholder="Dán văn bản TXT Trung Quốc vào đây hoặc kéo thả file TXT ở bên trái..."></textarea>
                 </div>
 
-                <!-- Khung Đầu Ra (Đã Làm Sạch) - Sử dụng Div Scroll thông minh hỗ trợ tô màu tìm kiếm -->
+                <!-- Khung Đầu Ra (Đã Làm Sạch) - Có Nút Lưu & Tô Màu Tìm Kiếm -->
                 <div class="flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
                     <div class="bg-slate-100 dark:bg-slate-700/50 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                         <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (HỖ TRỢ TÌM KIẾM & TÔ MÀU)
+                            <i class="fa-solid fa-circle-check"></i> KẾT QUẢ SẠCH (CÓ THỂ SỬA TRỰC TIẾP)
                         </span>
                         <div class="flex items-center gap-2">
+                            <button onclick="saveCleanChanges()" class="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded font-medium hover:bg-emerald-100 transition-colors cursor-pointer" title="Cập nhật lại số liệu thống kê sau khi bạn chỉnh sửa thủ công">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> Lưu thay đổi
+                            </button>
                             <button onclick="copyCleanText()" class="text-xs text-slate-500 hover:text-sky-600 transition-colors cursor-pointer">
                                 <i class="fa-solid fa-copy"></i> Sao chép
                             </button>
                         </div>
                     </div>
-                    <!-- Vùng chứa nội dung sạch có cuộn và bôi sáng -->
+                    <!-- Vùng chứa nội dung sạch có cuộn, chỉnh sửa trực tiếp và bôi sáng -->
                     <div id="clean-view" class="flex-1 w-full p-3 bg-transparent text-slate-800 dark:text-slate-200 font-mono text-xs leading-relaxed overflow-y-auto whitespace-pre-wrap select-text outline-none" contenteditable="true" oninput="syncCleanContent(this.innerText)" placeholder="Kết quả sau khi dọn rác sẽ hiển thị ở đây..."></div>
                 </div>
 
@@ -276,7 +279,7 @@
         const btnProcess = document.getElementById('btn-process');
 
         let currentFileName = "truyen_da_lam_sach.txt";
-        let cleanPlainText = ""; // Lưu trữ nội dung text thuần
+        let cleanPlainText = "";
 
         dropZone.onclick = () => fileInput.click();
         ['dragenter', 'dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('drop-active'); }));
@@ -438,7 +441,16 @@
             updateStats(rawText.length, text.length, origLines, Math.max(0, origLines - finalLines));
         }
 
-        // --- TÍNH NĂNG TÌM KIẾM VÀ TÔ MÀU (HIGHLIGHT) VÀO ĐÚNG TỪ KHÓA ---
+        function saveCleanChanges() {
+            const rawText = rawTextarea.value;
+            if (!cleanPlainText) return;
+            const origLines = rawText ? rawText.split(/\r?\n/).length : 0;
+            const finalLines = cleanPlainText.split(/\r?\n/).length;
+            updateStats(rawText.length, cleanPlainText.length, origLines, Math.max(0, origLines - finalLines));
+            statusNotification.textContent = "Đã lưu và cập nhật thống kê thành công!";
+            alert("Đã lưu thay đổi thành công!");
+        }
+
         let currentMatchIndex = -1;
         let matchPositions = [];
 
@@ -476,17 +488,14 @@
 
             const pos = matchPositions[currentMatchIndex];
 
-            // 1. Đóng modal để nhìn rõ kết quả
             closeFindModal();
 
-            // 2. Render lại nội dung, bọc từ khóa hiện tại bằng thẻ <mark> màu vàng nổi bật
             const before = cleanPlainText.substring(0, pos);
             const target = cleanPlainText.substring(pos, pos + keyword.length);
             const after = cleanPlainText.substring(pos + keyword.length);
 
             cleanView.innerHTML = escapeHtml(before) + `<mark class="search-highlight" id="highlight-target">${escapeHtml(target)}</mark>` + escapeHtml(after);
 
-            // 3. Cuộn mượt màn hình tới đúng vị trí từ khóa được tìm thấy
             const targetEl = document.getElementById('highlight-target');
             if (targetEl) {
                 targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
